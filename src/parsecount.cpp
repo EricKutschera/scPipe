@@ -83,54 +83,66 @@ int UMI_correct1(map<umi_pos_pair, int>& UMI_count)
 
 int UMI_correct2(map<umi_pos_pair, int>& UMI_count)
 {
-    bool found = false;
-    int corrected_UMI = 0;
+  map<umi_pos_pair, int> result = {};
+  for (const auto& upp_c_pair : UMI_count) {
+    const auto& upp = upp_c_pair.first;
+    const auto& umi = upp.first;
+    const auto& pos = upp.second;
+    const auto& count = upp_c_pair.second;
+    result[{umi, 0}] += count;
+  }
+  UMI_count = result;
+  return 0;
 
-    // iterate backwards to get better erase() performance
-    // erase must move all elements in the tail, starting from the tail is much
-    // more efficient than starting from the beginning
-    auto umi_pos1 = UMI_count.begin();
-    while (umi_pos1 != UMI_count.end())
-    {
-        found = false;
-        for (auto const &umi_pos2 : UMI_count)
-        {
-            auto const &umi1 = umi_pos1->first.first;
-            auto const &pos1 = umi_pos1->first.second;
-            auto const &count1 = umi_pos1->second;
+  
+    // bool found = false;
+    // int corrected_UMI = 0;
 
-            auto const &umi2 = umi_pos2.first.first;
-            auto const &pos2 = umi_pos2.first.second;
-            auto const &count2 = umi_pos2.second;
+    // // iterate backwards to get better erase() performance
+    // // erase must move all elements in the tail, starting from the tail is much
+    // // more efficient than starting from the beginning
+    // auto umi_pos1 = UMI_count.begin();
+    // while (umi_pos1 != UMI_count.end())
+    // {
+    //     found = false;
+    //     for (auto const &umi_pos2 : UMI_count)
+    //     {
+    //         auto const &umi1 = umi_pos1->first.first;
+    //         auto const &pos1 = umi_pos1->first.second;
+    //         auto const &count1 = umi_pos1->second;
 
-            if (abs(pos1 - pos2) < 2)
-                if (count1 == 1 || 2 * count1 < count2) {
-                {
-                    if (hamming_distance(umi1, umi2) <= 1) // sequencing errors
-                    {
-                        found = true;
-                        // merge two UMIs
-                        UMI_count[umi_pos2.first] += UMI_count[umi_pos1->first];
-                        if (__DEBUG) {
-                            Rcout << "merge: " <<  umi1 << "::" << umi2 << "\t" << umi_pos1->second << "::" << umi_pos2.second << "\n";
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        if (found)
-        {
-            // delete UMI1
-            corrected_UMI++;
-            umi_pos1 = UMI_count.erase(umi_pos1);
-        }
-        else
-        {
-            umi_pos1++;
-        }
-    }
-    return corrected_UMI;
+    //         auto const &umi2 = umi_pos2.first.first;
+    //         auto const &pos2 = umi_pos2.first.second;
+    //         auto const &count2 = umi_pos2.second;
+
+    //         if (abs(pos1 - pos2) < 2)
+    //             if (count1 == 1 || 2 * count1 < count2) {
+    //             {
+    //                 if (hamming_distance(umi1, umi2) <= 1) // sequencing errors
+    //                 {
+    //                     found = true;
+    //                     // merge two UMIs
+    //                     UMI_count[umi_pos2.first] += UMI_count[umi_pos1->first];
+    //                     if (__DEBUG) {
+    //                         Rcout << "merge: " <<  umi1 << "::" << umi2 << "\t" << umi_pos1->second << "::" << umi_pos2.second << "\n";
+    //                     }
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     if (found)
+    //     {
+    //         // delete UMI1
+    //         corrected_UMI++;
+    //         umi_pos1 = UMI_count.erase(umi_pos1);
+    //     }
+    //     else
+    //     {
+    //         umi_pos1++;
+    //     }
+    // }
+    // return corrected_UMI;
 }
 
 
